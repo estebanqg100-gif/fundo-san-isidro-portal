@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portal — Fundo San Isidro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-dark: #173d2b;
+      --gold: #c29e50;
+      --gold-deep: #a9843d;
+      --cream: #fbf8f1;
+      --card: #fffdf8;
+      --ink: #1c2b21;
+      --body-text: #59665c;
+      --line: rgba(23,61,43,0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      background: var(--green-dark);
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .brand {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    header .brand span {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    #logout {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.35);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #logout:hover { background: rgba(255,255,255,0.1); }
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 64px 24px;
+      text-align: center;
+    }
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-deep);
+    }
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 1.9rem;
+      margin: 10px 0 0;
+    }
+    p.lead {
+      margin-top: 14px;
+      color: var(--body-text);
+      line-height: 1.55;
+    }
+    .card {
+      margin-top: 32px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 26px;
+      text-align: left;
+    }
+    .card dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-deep); font-weight: 700; }
+    .card dd { margin: 4px 0 16px; font-size: 0.98rem; }
+    .card dd:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Fundo San Isidro<span>ISAMAT</span></div>
+    <button id="logout" type="button">Cerrar sesión</button>
+  </header>
+  <main>
+    <p class="eyebrow">Portal privado</p>
+    <h1 id="welcome">Bienvenido</h1>
+    <p class="lead">Iniciaste sesión correctamente. El resto del portal (certificaciones, calidad y formatos del fundo) se construye en el siguiente paso.</p>
+    <div class="card">
+      <dl id="user-info">
+        <dt>Cargando…</dt>
+      </dl>
+    </div>
+  </main>
+  <script>
+    (async function () {
+      try {
+        var res = await fetch('/api/auth/me');
+        if (!res.ok) { window.location.href = '/'; return; }
+        var data = await res.json();
+        document.getElementById('welcome').textContent = 'Hola, ' + data.user.fullName.split(' ')[0];
+        document.getElementById('user-info').innerHTML =
+          '<dt>Usuario</dt><dd>' + data.user.username + '</dd>' +
+          '<dt>Nombre</dt><dd>' + data.user.fullName + '</dd>' +
+          '<dt>Rol</dt><dd>' + data.user.role + '</dd>';
+      } catch (e) {
+        window.location.href = '/';
+      }
+    })();
+
+    document.getElementById('logout').addEventListener('click', async function () {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>
