@@ -94,6 +94,20 @@
     .card dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-deep); font-weight: 700; }
     .card dd { margin: 4px 0 16px; font-size: 0.98rem; }
     .card dd:last-child { margin-bottom: 0; }
+    .map-link {
+      margin-top: 22px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-dark);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 12px 20px;
+      border-radius: 999px;
+    }
+    .map-link:hover { background: #0f2e20; }
   </style>
 </head>
 <body>
@@ -110,6 +124,7 @@
         <dt>Cargando…</dt>
       </dl>
     </div>
+    <a class="map-link" href="/portal/mapa-sectores">Ver croquis de sectores →</a>
   </main>
   <script>
     (async function () {
