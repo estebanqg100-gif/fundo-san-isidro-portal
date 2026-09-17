@@ -7,6 +7,7 @@ const pgSession = require("connect-pg-simple")(session);
  
 const { pool } = require("./db");
 const authRoutes = require("./routes/auth");
+const sectoresRoutes = require("./routes/sectores");
  
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,15 @@ function requireAuth(req, res, next) {
   next();
 }
  
+function requireAuthApi(req, res, next) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "No autenticado." });
+  }
+  next();
+}
+ 
+app.use("/api/sectores", requireAuthApi, sectoresRoutes);
+ 
 app.get("/portal", requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "portal.html"));
 });
@@ -53,3 +63,4 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 app.listen(PORT, () => {
   console.log(`Fundo San Isidro portal escuchando en el puerto ${PORT}`);
 });
+ 
