@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administración — Fundo San Isidro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --cream:#fbf8f1; --beige:#e8dfcc; --card:#fffdf8; --card-2:#f4efe3;
+    --green-950:#0f2e20; --green-900:#173d2b; --ink-soft:#4d5a48; --muted:#8a8171;
+    --gold-600:#c29e50; --gold-700:#a9813a;
+    --line: rgba(23,61,43,0.16); --line-fallow: rgba(90,84,68,0.4);
+    --status-good:#2f7a3d; --status-good-bg:rgba(47,122,61,.13);
+    --status-warn:#8f6412; --status-warn-bg:rgba(143,100,18,.14);
+    --status-critical:#a3390f; --status-critical-bg:rgba(163,57,15,.13);
+    --status-muted:#726b5c; --status-muted-bg:rgba(114,107,92,.14);
+    --shadow-rest: 0 1px 2px rgba(23,61,43,.08);
+    --shadow-card: 0 2px 10px -4px rgba(23,61,43,.16), 0 1px 2px rgba(23,61,43,.06);
+    --shadow-lift: 0 18px 30px -12px rgba(23,61,43,.34);
+    color-scheme: light;
+  }
+
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{ margin:0; background:var(--cream); color:var(--green-900); font-family:'Inter',system-ui,sans-serif; }
+  h1,h2{ font-family:'Fraunces',Georgia,serif; text-wrap:balance; margin:0; }
+
+  .bg-photo{
+    position:fixed; inset:0; z-index:0;
+    background-image:
+      linear-gradient(180deg, rgba(251,248,241,.58) 0%, rgba(232,223,204,.52) 42%, rgba(251,248,241,.82) 100%),
+      url('/assets/fondo-fundo.jpg');
+    background-size: cover;
+    background-position: center 58%;
+    background-repeat: no-repeat;
+    filter: saturate(.92) brightness(1.02) blur(1px);
+  }
+
+  .shell{ position:relative; z-index:1; display:flex; min-height:100vh; }
+
+  .sidenav{
+    flex:0 0 240px; width:240px; box-sizing:border-box;
+    background:var(--green-900); color:#eef2ea;
+    display:flex; flex-direction:column;
+    padding:22px 16px 18px;
+    position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto;
+  }
+  .side-brand{ display:flex; align-items:center; gap:10px; margin-bottom:28px; }
+  .side-logo{ flex:none; width:34px; height:34px; border-radius:10px; background:var(--gold-600); color:var(--green-950); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px; letter-spacing:.02em; }
+  .side-brand-txt{ display:flex; flex-direction:column; min-width:0; }
+  .side-brand-txt strong{ font-family:'Fraunces',Georgia,serif; font-size:14.5px; font-weight:600; color:#fff; line-height:1.2; }
+  .side-brand-txt span{ font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:rgba(238,242,234,.55); margin-top:2px; }
+
+  .side-nav{ display:flex; flex-direction:column; gap:4px; flex:1; min-height:0; }
+  .side-link{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; color:#eef2ea; text-decoration:none; font-size:13.5px; font-weight:500; transition:background .15s ease; }
+  .side-link svg{ flex:none; opacity:.9; }
+  .side-link:hover{ background:rgba(255,255,255,.07); }
+  .side-link.is-active{ background:rgba(255,255,255,.13); box-shadow: inset 3px 0 0 0 var(--gold-600); }
+
+  .side-soon{ margin-top:22px; padding-top:16px; border-top:1px solid rgba(255,255,255,.1); display:flex; flex-direction:column; gap:9px; }
+  .side-soon-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:rgba(238,242,234,.5); }
+  .side-soon-item i{ font-style:normal; flex:none; background:rgba(255,255,255,.1); padding:2px 7px; border-radius:999px; font-size:8.5px; letter-spacing:.05em; text-transform:uppercase; color:rgba(238,242,234,.68); }
+
+  .side-account{ margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,.14); display:flex; flex-direction:column; gap:8px; }
+  .side-user{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .side-avatar{ flex:none; width:32px; height:32px; border-radius:50%; background:var(--gold-600); color:var(--green-950); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+  .side-user-txt{ min-width:0; display:flex; flex-direction:column; }
+  .side-user-txt strong{ font-size:12.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .side-user-txt span{ font-size:10.5px; color:rgba(238,242,234,.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .side-btn{ appearance:none; width:100%; display:flex; align-items:center; gap:9px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:#eef2ea; border-radius:10px; padding:9px 11px; font:inherit; font-size:12.5px; cursor:pointer; transition: background .15s ease, border-color .15s ease; }
+  .side-btn svg{ flex:none; opacity:.9; }
+  .side-btn:hover{ background:rgba(255,255,255,.12); }
+  .side-btn-logout:hover{ background:rgba(197,90,90,.2); border-color:rgba(217,140,140,.35); }
+
+  @media (max-width:880px){
+    .shell{ flex-direction:column; }
+    .sidenav{ position:relative; top:auto; height:auto; width:100%; flex:none; flex-direction:row; align-items:center; padding:12px 14px; gap:14px; overflow-x:auto; }
+    .side-brand{ margin-bottom:0; flex:none; }
+    .side-nav{ flex-direction:row; flex:1; }
+    .side-soon{ display:none; }
+    .side-account{ margin-top:0; padding-top:0; border-top:none; flex-direction:row; gap:8px; flex:none; }
+    .side-user{ display:none; }
+    .side-btn .side-label{ display:none; }
+    .side-btn{ width:auto; padding:9px; }
+  }
+
+  .content{ flex:1; min-width:0; padding: 32px clamp(16px,3vw,48px) 60px; }
+  .wrap{ max-width:1180px; margin-inline:auto; }
+
+  .pagehead{ display:flex; flex-direction:column; gap:8px; }
+  .eyebrow{ display:flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold-700); font-weight:600; }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold-600); flex:none; }
+  h1{ font-size:clamp(27px,3.8vw,38px); font-weight:600; }
+  .lede{ color:var(--ink-soft); font-size:14.5px; max-width:64ch; line-height:1.6; margin-top:2px; }
+
+  .kpi-row{ margin-top:22px; display:grid; grid-template-columns:repeat(auto-fit,minmax(184px,1fr)); gap:12px; }
+  .kpi-tile{
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 17px;
+    display:flex; flex-direction:column; gap:9px; box-shadow:var(--shadow-card); min-width:0;
+  }
+  .kpi-tile .kpi-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .kpi-tile .kpi-icon{ flex:none; width:26px; height:26px; border-radius:8px; background:var(--beige); color:var(--gold-700); display:flex; align-items:center; justify-content:center; }
+  .kpi-tile .kpi-label{ font-size:10.8px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .kpi-tile .kpi-value{ font-family:'Inter',system-ui,sans-serif; font-weight:700; font-size:25px; color:var(--green-900); line-height:1.1; letter-spacing:-.01em; }
+  .kpi-tile .kpi-sub{ font-size:11.5px; color:var(--muted); line-height:1.4; }
+  .kpi-tile.is-skel .kpi-value, .kpi-tile.is-skel .kpi-sub{ visibility:hidden; }
+  .kpi-skel-bar{ display:none; height:14px; border-radius:5px; background:linear-gradient(90deg, var(--beige) 25%, var(--card-2) 50%, var(--beige) 75%); background-size:200% 100%; animation:skelShine 1.4s ease-in-out infinite; }
+  .kpi-tile.is-skel .kpi-skel-bar{ display:block; }
+  .kpi-tile.is-skel .kpi-skel-bar.sub{ height:10px; width:70%; margin-top:2px; }
+  @keyframes skelShine{ 0%{ background-position:200% 0; } 100%{ background-position:-200% 0; } }
+  @media (prefers-reduced-motion:reduce){ .kpi-skel-bar{ animation:none; background:var(--beige); } }
+
+  .status-pill{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:3px 9px 3px 7px; border-radius:999px; line-height:1.4; white-space:nowrap; }
+  .status-pill svg{ flex:none; }
+  .status-pill.good{ background:var(--status-good-bg); color:var(--status-good); }
+  .status-pill.warn{ background:var(--status-warn-bg); color:var(--status-warn); }
+  .status-pill.critical{ background:var(--status-critical-bg); color:var(--status-critical); }
+  .status-pill.muted{ background:var(--status-muted-bg); color:var(--status-muted); }
+
+  .panel{ margin-top:32px; background:var(--card); border:1px solid var(--line); border-radius:18px; padding:22px 24px 24px; box-shadow:var(--shadow-card); }
+  .panel-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .panel-head h2{ font-size:19px; font-weight:600; }
+  .panel-head .sub{ font-size:12.5px; color:var(--muted); margin-top:3px; max-width:52ch; line-height:1.5; }
+  .panel-actions{ display:flex; align-items:center; gap:8px; flex:none; }
+
+  .btn{ appearance:none; border:none; border-radius:10px; font:inherit; font-weight:600; cursor:pointer; padding:9px 16px; font-size:13px; transition: background .15s ease, box-shadow .15s ease, transform .1s ease; }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--green-900); color:#fff; }
+  .btn-primary:hover{ background:var(--green-950); }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
+  .btn-ghost{ background:var(--beige); color:var(--green-900); }
+  .btn-ghost:hover{ background:var(--card-2); }
+  .btn-danger{ background:var(--status-critical-bg); color:var(--status-critical); }
+  .btn-danger:hover{ background:rgba(163,57,15,.22); }
+  .btn-sm{ padding:6px 11px; font-size:12px; border-radius:8px; }
+  .btn-num{ width:52px; text-align:center; border:1px solid var(--line); border-radius:8px; padding:7px 6px; font:inherit; font-size:13px; background:var(--card); color:var(--green-900); }
+
+  .table-wrap{ margin-top:18px; overflow:auto; max-height:58vh; border-radius:12px; border:1px solid var(--line); }
+  table.admin-table{ width:100%; border-collapse:collapse; font-size:12.8px; }
+  table.admin-table th, table.admin-table td{ padding:10px 13px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+  table.admin-table th{ position:sticky; top:0; background:var(--beige); font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; }
+  table.admin-table td.mono{ font-family:'IBM Plex Mono',monospace; letter-spacing:.02em; }
+  table.admin-table tr:last-child td{ border-bottom:none; }
+  table.admin-table td.actions-col{ text-align:right; }
+  table.admin-table tbody tr:hover{ background:rgba(23,61,43,.03); }
+
+  .empty-row td{ color:var(--muted); font-style:italic; text-align:center; padding:22px 12px; }
+
+  .code-reveal{ margin-top:16px; padding:14px 16px; background:var(--status-good-bg); border:1px solid rgba(47,122,61,.28); border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .code-reveal[hidden]{ display:none; }
+  .code-reveal .cr-text{ display:flex; flex-direction:column; gap:2px; }
+  .code-reveal .cr-label{ font-size:11px; color:var(--status-good); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .code-reveal .cr-code{ font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:var(--green-950); letter-spacing:.06em; }
+
+  .confirm-row{ display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+  .confirm-row span{ font-size:12px; color:var(--muted); }
+
+  .inline-alert{ margin-top:14px; padding:11px 14px; border-radius:12px; font-size:12.5px; line-height:1.5; }
+  .inline-alert.error{ background:var(--status-critical-bg); color:var(--status-critical); }
+  .inline-alert[hidden]{ display:none; }
+
+  .footnote{ margin-top:40px; padding-top:14px; border-top:1px solid var(--line); font-size:11.5px; color:var(--muted); }
+
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(10px); background:var(--green-950); color:#fff; padding:10px 20px; border-radius:999px; font-size:13px; font-weight:500; box-shadow:0 14px 28px rgba(0,0,0,.28); opacity:0; transition:opacity .25s ease, transform .25s ease; z-index:60; pointer-events:none; }
+  .toast.is-visible{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:640px){
+    table.admin-table th, table.admin-table td{ padding:9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-photo" aria-hidden="true"></div>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="/portal" class="side-brand" style="text-decoration:none;color:inherit;">
+      <span class="side-logo">FSI</span>
+      <div class="side-brand-txt">
+        <strong>Fundo San Isidro</strong>
+        <span>Portal interno</span>
+      </div>
+    </a>
+
+    <nav class="side-nav">
+      <a class="side-link" href="/portal/mapa-sectores">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+        <span class="side-label">Croquis de sectores</span>
+      </a>
+      <a class="side-link is-active" href="/portal/admin" aria-current="page">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5Z"/><path d="M9 9V7a3 3 0 0 1 6 0v2"/></svg>
+        <span class="side-label">Administración</span>
+      </a>
+      <div class="side-soon">
+        <span class="side-soon-item">Formulario de evaluación <i>Pronto</i></span>
+      </div>
+    </nav>
+
+    <div class="side-account">
+      <div class="side-user">
+        <span class="side-avatar" id="side-avatar">—</span>
+        <div class="side-user-txt">
+          <strong id="side-user-name">Cargando…</strong>
+          <span id="side-user-role">&nbsp;</span>
+        </div>
+      </div>
+      <button type="button" class="side-btn" id="mi-cuenta-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        <span class="side-label">Mi cuenta</span>
+      </button>
+      <button type="button" class="side-btn side-btn-logout" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M15 16l4-4-4-4"/><path d="M19 12H9"/></svg>
+        <span class="side-label">Cerrar sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="wrap">
+      <div class="pagehead">
+        <div class="eyebrow"><span class="dot"></span>Panel de administración</div>
+        <h1>Administración</h1>
+        <p class="lede">Gestiona el acceso al portal: quién puede registrarse, quién ya tiene cuenta y la recuperación de contraseñas — todo por código, sin exponer credenciales.</p>
+      </div>
+
+      <div class="kpi-row" id="kpi-row">
+        <div class="kpi-tile is-skel" id="kpi-usuarios">
+          <div class="kpi-top">
+            <span class="kpi-label">Usuarios registrados</span>
+            <span class="kpi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          </div>
+          <div class="kpi-skel-bar"></div>
+          <div class="kpi-value" id="kpi-usuarios-value">—</div>
+          <div class="kpi-skel-bar sub"></div>
+          <div class="kpi-sub" id="kpi-usuarios-sub">Con cuenta activa</div>
+        </div>
+
+        <div class="kpi-tile is-skel" id="kpi-admins">
+          <div class="kpi-top">
+            <span class="kpi-label">Administradores</span>
+            <span class="kpi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 3.8 8.7 9 10 5.2-1.3 9-5 9-10V6Z"/></svg></span>
+          </div>
+          <div class="kpi-skel-bar"></div>
+          <div class="kpi-value" id="kpi-admins-value">—</div>
+          <div class="kpi-skel-bar sub"></div>
+          <div class="kpi-sub">Con permisos totales</div>
+        </div>
+
+        <div class="kpi-tile is-skel" id="kpi-disponibles">
+          <div class="kpi-top">
+            <span class="kpi-label">Códigos disponibles</span>
+            <span class="kpi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>
+          </div>
+          <div class="kpi-skel-bar"></div>
+          <div class="kpi-value" id="kpi-disponibles-value">—</div>
+          <div class="kpi-skel-bar sub"></div>
+          <div class="kpi-sub">Invitaciones sin usar</div>
+        </div>
+
+        <div class="kpi-tile is-skel" id="kpi-usados">
+          <div class="kpi-top">
+            <span class="kpi-label">Códigos usados</span>
+            <span class="kpi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          </div>
+          <div class="kpi-skel-bar"></div>
+          <div class="kpi-value" id="kpi-usados-value">—</div>
+          <div class="kpi-skel-bar sub"></div>
+          <div class="kpi-sub">Ya canjeados por un registro</div>
+        </div>
+      </div>
+
+      <!-- ---- Códigos de invitación ---- -->
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Códigos de invitación</h2>
+            <p class="sub">Un código de invitación permite que una persona se registre una sola vez en el portal. Genera uno o varios y compártelos por el canal que prefieras (WhatsApp, en persona, etc.).</p>
+          </div>
+          <div class="panel-actions">
+            <input type="number" class="btn-num" id="invite-count" value="1" min="1" max="10">
+            <button type="button" class="btn btn-primary" id="gen-invite-btn">Generar código</button>
+          </div>
+        </div>
+
+        <div class="code-reveal" id="invite-reveal" hidden>
+          <div class="cr-text">
+            <span class="cr-label">Código generado</span>
+            <span class="cr-code" id="invite-reveal-code">—</span>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="invite-copy-btn">Copiar</button>
+        </div>
+
+        <div class="inline-alert error" id="invite-error" hidden></div>
+
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Estado</th>
+                <th>Usado por</th>
+                <th>Creado</th>
+                <th>Usado</th>
+                <th class="actions-col">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="invite-tbody">
+              <tr class="empty-row"><td colspan="6">Cargando códigos…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ---- Usuarios ---- -->
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Usuarios</h2>
+            <p class="sub">Si alguien olvida su contraseña, genera aquí un código de recuperación de un solo uso — la persona lo ingresa en "¿Olvidaste tu contraseña?" en la pantalla de inicio de sesión.</p>
+          </div>
+        </div>
+
+        <div class="code-reveal" id="reset-reveal" hidden>
+          <div class="cr-text">
+            <span class="cr-label" id="reset-reveal-label">Código de recuperación</span>
+            <span class="cr-code" id="reset-reveal-code">—</span>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="reset-copy-btn">Copiar</button>
+        </div>
+
+        <div class="inline-alert error" id="users-error" hidden></div>
+
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Alta</th>
+                <th class="actions-col">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr class="empty-row"><td colspan="5">Cargando usuarios…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="footnote">Los códigos de invitación y de recuperación son de un solo uso. Un código de invitación se revoca solo si nadie lo ha usado todavía. Toda esta información se guarda de forma segura en la base de datos del portal.</p>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('is-visible'); }, 2200);
+  }
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function formatFecha(iso){
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return d.getDate() + ' ' + MESES[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  async function copyText(text){
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // ---- Sesión ----
+  (async function loadSession(){
+    try {
+      var res = await fetch('/api/auth/me');
+      if (!res.ok) { window.location.href = '/'; return; }
+      var data = await res.json();
+      var u = data.user || {};
+      if (u.role !== 'admin') { window.location.href = '/portal'; return; }
+      var fullName = u.fullName || 'Cuenta';
+      var initials = fullName.trim().split(/\s+/).slice(0,2).map(function(w){ return w.charAt(0); }).join('').toUpperCase() || 'US';
+      var nameEl = document.getElementById('side-user-name');
+      var roleEl = document.getElementById('side-user-role');
+      var avatarEl = document.getElementById('side-avatar');
+      if (nameEl) nameEl.textContent = fullName;
+      if (roleEl) roleEl.textContent = 'Administrador';
+      if (avatarEl) avatarEl.textContent = initials;
+    } catch (e) {
+      window.location.href = '/';
+    }
+  })();
+
+  var logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', async function(){
+    logoutBtn.disabled = true;
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+    window.location.href = '/';
+  });
+
+  var miCuentaBtn = document.getElementById('mi-cuenta-btn');
+  if (miCuentaBtn) miCuentaBtn.addEventListener('click', function(){ showToast('Próximamente'); });
+
+  // ---- KPIs ----
+  function setKpi(tileId, valueId, value){
+    var tile = document.getElementById(tileId);
+    var valEl = document.getElementById(valueId);
+    if (valEl) valEl.textContent = value;
+    if (tile) tile.classList.remove('is-skel');
+  }
+
+  function recomputeKpis(users, codes){
+    var admins = users.filter(function(u){ return u.role === 'admin'; }).length;
+    var disponibles = codes.filter(function(c){ return !c.used_at; }).length;
+    var usados = codes.filter(function(c){ return !!c.used_at; }).length;
+    setKpi('kpi-usuarios', 'kpi-usuarios-value', String(users.length));
+    setKpi('kpi-admins', 'kpi-admins-value', String(admins));
+    setKpi('kpi-disponibles', 'kpi-disponibles-value', String(disponibles));
+    setKpi('kpi-usados', 'kpi-usados-value', String(usados));
+  }
+
+  // ---- Estado en memoria ----
+  var STATE = { users: [], codes: [] };
+
+  // ---- Códigos de invitación ----
+  function renderInviteTable(){
+    var tbody = document.getElementById('invite-tbody');
+    if (!STATE.codes.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Todavía no hay códigos de invitación generados.</td></tr>';
+      return;
+    }
+    var rows = STATE.codes.map(function(c){
+      var isUsed = !!c.used_at;
+      var pill = isUsed
+        ? '<span class="status-pill muted"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12"/></svg>Usado</span>'
+        : '<span class="status-pill good"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12"/></svg>Disponible</span>';
+      var usedBy = isUsed ? esc(c.used_by_name || c.used_by_username || '—') : '—';
+      var actionCell;
+      if (isUsed) {
+        actionCell = '<span style="color:var(--muted); font-size:12px;">—</span>';
+      } else {
+        actionCell = '<button type="button" class="btn btn-danger btn-sm" data-revoke-id="' + c.id + '">Revocar</button>';
+      }
+      return '<tr data-code-id="' + c.id + '">' +
+        '<td class="mono">' + esc(c.code) + '</td>' +
+        '<td>' + pill + '</td>' +
+        '<td>' + usedBy + '</td>' +
+        '<td>' + formatFecha(c.created_at) + '</td>' +
+        '<td>' + (isUsed ? formatFecha(c.used_at) : '—') + '</td>' +
+        '<td class="actions-col" id="actions-' + c.id + '">' + actionCell + '</td>' +
+      '</tr>';
+    }).join('');
+    tbody.innerHTML = rows;
+
+    tbody.querySelectorAll('[data-revoke-id]').forEach(function(btn){
+      btn.addEventListener('click', function(){ askConfirmRevoke(btn.getAttribute('data-revoke-id')); });
+    });
+  }
+
+  function askConfirmRevoke(id){
+    var cell = document.getElementById('actions-' + id);
+    if (!cell) return;
+    cell.innerHTML =
+      '<div class="confirm-row">' +
+        '<span>¿Revocar?</span>' +
+        '<button type="button" class="btn btn-danger btn-sm" id="confirm-revoke-' + id + '">Sí, revocar</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="cancel-revoke-' + id + '">Cancelar</button>' +
+      '</div>';
+    document.getElementById('confirm-revoke-' + id).addEventListener('click', function(){ doRevoke(id); });
+    document.getElementById('cancel-revoke-' + id).addEventListener('click', function(){ renderInviteTable(); });
+  }
+
+  async function doRevoke(id){
+    var cell = document.getElementById('actions-' + id);
+    if (cell) cell.innerHTML = '<span style="color:var(--muted); font-size:12px;">Revocando…</span>';
+    try {
+      var res = await fetch('/api/admin/invite-codes/' + id, { method: 'DELETE' });
+      var data = await res.json().catch(function(){ return {}; });
+      if (!res.ok) throw new Error(data.error || 'No se pudo revocar el código.');
+      STATE.codes = STATE.codes.filter(function(c){ return String(c.id) !== String(id); });
+      recomputeKpis(STATE.users, STATE.codes);
+      renderInviteTable();
+      showToast('Código revocado.');
+    } catch (e) {
+      showToast(e.message || 'No se pudo revocar el código.');
+      renderInviteTable();
+    }
+  }
+
+  async function loadInviteCodes(){
+    try {
+      var res = await fetch('/api/admin/invite-codes');
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al cargar.');
+      STATE.codes = data.codes || [];
+      renderInviteTable();
+      recomputeKpis(STATE.users, STATE.codes);
+    } catch (e) {
+      var tbody = document.getElementById('invite-tbody');
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No se pudieron cargar los códigos.</td></tr>';
+    }
+  }
+
+  var genInviteBtn = document.getElementById('gen-invite-btn');
+  var inviteCountInput = document.getElementById('invite-count');
+  var inviteReveal = document.getElementById('invite-reveal');
+  var inviteRevealCode = document.getElementById('invite-reveal-code');
+  var inviteErrorEl = document.getElementById('invite-error');
+
+  genInviteBtn.addEventListener('click', async function(){
+    inviteErrorEl.hidden = true;
+    var count = Math.min(Math.max(parseInt(inviteCountInput.value, 10) || 1, 1), 10);
+    genInviteBtn.disabled = true;
+    genInviteBtn.textContent = 'Generando…';
+    try {
+      var res = await fetch('/api/admin/invite-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count: count })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'No se pudieron generar los códigos.');
+      var newCodes = data.codes || [];
+      STATE.codes = newCodes.concat(STATE.codes);
+      renderInviteTable();
+      recomputeKpis(STATE.users, STATE.codes);
+      if (newCodes.length === 1) {
+        inviteRevealCode.textContent = newCodes[0].code;
+        inviteReveal.hidden = false;
+      } else {
+        inviteRevealCode.textContent = newCodes.map(function(c){ return c.code; }).join('   ·   ');
+        inviteReveal.hidden = false;
+      }
+      showToast(newCodes.length > 1 ? (newCodes.length + ' códigos generados.') : 'Código generado.');
+    } catch (e) {
+      inviteErrorEl.textContent = e.message || 'No se pudieron generar los códigos.';
+      inviteErrorEl.hidden = false;
+    } finally {
+      genInviteBtn.disabled = false;
+      genInviteBtn.textContent = 'Generar código';
+    }
+  });
+
+  document.getElementById('invite-copy-btn').addEventListener('click', async function(){
+    var ok = await copyText(inviteRevealCode.textContent);
+    showToast(ok ? 'Copiado al portapapeles.' : 'No se pudo copiar.');
+  });
+
+  // ---- Usuarios ----
+  function renderUsersTable(){
+    var tbody = document.getElementById('users-tbody');
+    if (!STATE.users.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Todavía no hay usuarios registrados.</td></tr>';
+      return;
+    }
+    var rows = STATE.users.map(function(u){
+      var rolePill = u.role === 'admin'
+        ? '<span class="status-pill warn"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12"/></svg>Administrador</span>'
+        : '<span class="status-pill muted"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12"/></svg>Equipo de calidad</span>';
+      return '<tr>' +
+        '<td>' + esc(u.full_name) + '</td>' +
+        '<td class="mono">' + esc(u.username) + '</td>' +
+        '<td>' + rolePill + '</td>' +
+        '<td>' + formatFecha(u.created_at) + '</td>' +
+        '<td class="actions-col"><button type="button" class="btn btn-ghost btn-sm" data-reset-id="' + u.id + '" data-reset-name="' + esc(u.full_name) + '">Generar código de recuperación</button></td>' +
+      '</tr>';
+    }).join('');
+    tbody.innerHTML = rows;
+
+    tbody.querySelectorAll('[data-reset-id]').forEach(function(btn){
+      btn.addEventListener('click', function(){ genResetCode(btn.getAttribute('data-reset-id'), btn); });
+    });
+  }
+
+  var resetReveal = document.getElementById('reset-reveal');
+  var resetRevealCode = document.getElementById('reset-reveal-code');
+  var resetRevealLabel = document.getElementById('reset-reveal-label');
+  var usersErrorEl = document.getElementById('users-error');
+
+  async function genResetCode(userId, btn){
+    usersErrorEl.hidden = true;
+    var originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generando…';
+    try {
+      var res = await fetch('/api/admin/reset-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'No se pudo generar el código.');
+      resetRevealLabel.textContent = 'Código de recuperación para ' + (data.forUser || 'usuario');
+      resetRevealCode.textContent = data.code;
+      resetReveal.hidden = false;
+      showToast('Código de recuperación generado.');
+    } catch (e) {
+      usersErrorEl.textContent = e.message || 'No se pudo generar el código.';
+      usersErrorEl.hidden = false;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
+
+  document.getElementById('reset-copy-btn').addEventListener('click', async function(){
+    var ok = await copyText(resetRevealCode.textContent);
+    showToast(ok ? 'Copiado al portapapeles.' : 'No se pudo copiar.');
+  });
+
+  async function loadUsers(){
+    try {
+      var res = await fetch('/api/admin/users');
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al cargar.');
+      STATE.users = data.users || [];
+      renderUsersTable();
+      recomputeKpis(STATE.users, STATE.codes);
+    } catch (e) {
+      var tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No se pudieron cargar los usuarios.</td></tr>';
+    }
+  }
+
+  loadUsers();
+  loadInviteCodes();
+})();
+</script>
+</body>
+</html>
